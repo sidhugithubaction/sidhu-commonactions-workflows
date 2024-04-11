@@ -1,0 +1,51 @@
+name: "to-publish-to-ghcr"
+description: "to-publish-to-ghcr"
+author: "sidhusaiprasanth@gmail.com"
+branding:
+  color: black
+  icon: arrow-right-circle
+inputs:
+  ghcr_registry:
+    default: ghcr.io
+    description: github container registry url
+    #required: true
+  ghcr_username:
+    default: ${{ github.actor }}
+    description: Username to login to Ghcr
+    #required: true
+  ghcr_password:
+    default: ${{ secrets.GHCR_TOKEN }}
+    description: password to login to GHCR
+  image_name:
+    default: ${{ github.repository }}
+    #required: true
+    description: Imagename
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    - run: |
+        echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c 1-7)" >> "$GITHUB_ENV" 
+        echo $SHORT_SHA
+      shell: bash
+    - name: Login Docker
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.ghcr_registry }}
+        username: ${{ inputs.ghcr_username }}
+        password: ${{ inputs.ghcr_password }}
+    - uses: docker/metadata-action@v5
+      id: meta
+      with:
+        # images: ${{ secrets.HARBOR_REGISTRY }}/${{ secrets.HARBOR_PROJECT }}/courserepo
+        images: ${{ inputs.ghcr_registry }}/${{ inputs.image_name }}
+        tags: |
+          ${{ env.SHORT_SHA }}
+    - uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
