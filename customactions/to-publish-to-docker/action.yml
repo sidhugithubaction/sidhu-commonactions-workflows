@@ -6,13 +6,11 @@ branding:
   icon: arrow-right-circle
 inputs:
   docker_username:
-    default: ${{ secrets.DOCKER_USERNAME }}
     description: Docker username to login
-    # required: true
+    required: true
   docker_password:
-    default: ${{ secrets.DOCKER_PASSWORD }}
     description: Docker password to login
-    # required: true
+    required: true
   image_name:
     required: true
     description: Imagename

@@ -14,7 +14,7 @@ inputs:
     description: Username to login to Ghcr
     #required: true
   ghcr_password:
-    default: ${{ secrets.GHCR_TOKEN }}
+    required: true
     description: password to login to GHCR
   image_name:
     default: ${{ github.repository }}
